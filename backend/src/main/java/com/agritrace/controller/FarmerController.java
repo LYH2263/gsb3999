@@ -18,6 +18,7 @@ public class FarmerController {
     @Autowired private ProductRepository productRepository;
     @Autowired private TracingCodeRepository tracingCodeRepository;
     @Autowired private HotProductRepository hotProductRepository;
+    @Autowired private com.agritrace.service.FarmingRecordService farmingRecordService;
 
     @GetMapping("/products")
     public Result<List<Product>> getProducts(HttpServletRequest request) {
@@ -59,7 +60,10 @@ public class FarmerController {
         if (!"SYS_ADMIN".equals(role) && !p.getFarmerId().equals(userId)) {
             return Result.error(403, "没有该操作的权限");
         }
-        
+
+        // 安全间隔期校验（业务规则下沉至 Service）：间隔期内禁止生成溯源码
+        farmingRecordService.assertTraceCodeAllowed(productId);
+
         TracingCode tc = new TracingCode();
         tc.setProductId(productId);
         tc.setTraceCode(UUID.randomUUID().toString().replace("-", "").substring(0, 16).toUpperCase());

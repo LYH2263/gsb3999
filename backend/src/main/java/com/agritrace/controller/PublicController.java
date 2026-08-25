@@ -23,6 +23,7 @@ public class PublicController {
     @Autowired private ProductRepository productRepository;
     @Autowired private TracingCodeRepository tracingCodeRepository;
     @Autowired private LogisticsRepository logisticsRepository;
+    @Autowired private com.agritrace.service.FarmingRecordService farmingRecordService;
 
     @GetMapping("/hot")
     public Result<?> getHotProducts() {
@@ -70,6 +71,8 @@ public class PublicController {
         data.put("product", p);
         data.put("logistics", logs);
         data.put("traceInfo", tc);
+        // 消费者只读查看该产品的全部农事档案
+        data.put("farmingRecords", p != null ? farmingRecordService.getPublicRecords(p.getId()) : java.util.Collections.emptyList());
         return Result.success(data);
     }
     

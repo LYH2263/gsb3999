@@ -44,6 +44,11 @@ public class SecurityInterceptor implements HandlerInterceptor {
                     response.setStatus(403);
                     return false;
                 }
+                // 农事档案模块：仅农户与系统管理员可进入，物流管理员与普通消费者一律拦截
+                if (path.startsWith("/api/farming") && !("FARMER".equals(role) || "SYS_ADMIN".equals(role))) {
+                    response.setStatus(403);
+                    return false;
+                }
                 if (path.startsWith("/api/logistics") && !("LOGS_ADMIN".equals(role) || "SYS_ADMIN".equals(role))) {
                     response.setStatus(403);
                     return false;
