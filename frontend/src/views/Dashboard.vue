@@ -30,6 +30,25 @@
           </el-timeline-item>
         </el-timeline>
         <el-empty v-else description="暂无物流信息" />
+
+        <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-4">🌱 农事档案</h3>
+        <el-timeline v-if="traceResult.farmingRecords && traceResult.farmingRecords.length > 0">
+          <el-timeline-item
+            v-for="(rec, idx) in traceResult.farmingRecords"
+            :key="idx"
+            :timestamp="rec.operationDate"
+            :color="farmingTypeColor(rec.operationType)"
+          >
+            <el-tag :type="farmingTypeTag(rec.operationType)" size="small" effect="dark" class="mr-2">{{ farmingTypeLabel(rec.operationType) }}</el-tag>
+            <span v-if="rec.operationType === 'PESTICIDE'">
+              用药：<strong>{{ rec.pesticideName }}</strong>，安全间隔期 {{ rec.safetyIntervalDays }} 天
+              <el-tag v-if="isInInterval(rec)" type="danger" size="small" class="ml-2">间隔期内</el-tag>
+              <el-tag v-else type="success" size="small" class="ml-2">已过间隔期</el-tag>
+            </span>
+            <span v-else>{{ rec.remark || '无备注' }}</span>
+          </el-timeline-item>
+        </el-timeline>
+        <el-empty v-else description="暂无农事档案记录" :image-size="60" />
       </div>
     </div>
 
@@ -84,6 +103,16 @@ const queryTrace = async () => {
   } finally {
     tracing.value = false
   }
+}
+
+const farmingTypeLabel = (t) => ({ SOWING: '播种', FERTILIZING: '施肥', PESTICIDE: '用药' }[t] || t)
+const farmingTypeTag = (t) => ({ SOWING: 'primary', FERTILIZING: 'warning', PESTICIDE: 'danger' }[t] || 'info')
+const farmingTypeColor = (t) => ({ SOWING: '#409eff', FERTILIZING: '#e6a23c', PESTICIDE: '#f56c6c' }[t] || '#909399')
+const isInInterval = (rec) => {
+  if (rec.operationType !== 'PESTICIDE' || rec.safetyIntervalDays == null) return false
+  const d = new Date(rec.operationDate + 'T00:00:00')
+  d.setDate(d.getDate() + rec.safetyIntervalDays)
+  return new Date().toISOString().slice(0, 10) <= d.toISOString().slice(0, 10)
 }
 
 onMounted(() => {

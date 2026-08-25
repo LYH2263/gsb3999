@@ -8,6 +8,7 @@ import com.agritrace.repository.HotProductRepository;
 import com.agritrace.repository.LogisticsRepository;
 import com.agritrace.repository.ProductRepository;
 import com.agritrace.repository.TracingCodeRepository;
+import com.agritrace.service.FarmingRecordService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 import java.util.ArrayList;
@@ -23,6 +24,7 @@ public class PublicController {
     @Autowired private ProductRepository productRepository;
     @Autowired private TracingCodeRepository tracingCodeRepository;
     @Autowired private LogisticsRepository logisticsRepository;
+    @Autowired private FarmingRecordService farmingRecordService;
 
     @GetMapping("/hot")
     public Result<?> getHotProducts() {
@@ -69,6 +71,7 @@ public class PublicController {
         Map<String, Object> data = new HashMap<>();
         data.put("product", p);
         data.put("logistics", logs);
+        data.put("farmingRecords", farmingRecordService.listRecordsByProductForPublic(tc.getProductId()));
         data.put("traceInfo", tc);
         return Result.success(data);
     }

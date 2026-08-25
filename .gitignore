@@ -1,3 +1,32 @@
 # 对话与题目
 对话/
 题目.md
+
+# Maven
+backend/target/
+**/target/
+
+# Node / 前端构建
+frontend/node_modules/
+frontend/dist/
+**/node_modules/
+**/dist/
+
+# 环境与本地配置
+.env
+.env.*
+!.env.example
+*.local
+
+# IDE / 系统
+.idea/
+.vscode/
+*.iml
+.DS_Store
+Thumbs.db
+
+# 日志与临时文件
+*.log
+*.tmp
+*.swp
+*~
