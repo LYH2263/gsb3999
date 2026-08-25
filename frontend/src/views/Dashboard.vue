@@ -30,6 +30,29 @@
           </el-timeline-item>
         </el-timeline>
         <el-empty v-else description="暂无物流信息" />
+
+        <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-4">🌱 农事档案（只读）</h3>
+        <el-table v-if="traceResult.farmingRecords && traceResult.farmingRecords.length > 0" :data="traceResult.farmingRecords" size="small" border>
+          <el-table-column label="操作类型" width="100">
+            <template #default="{row}">
+              <el-tag size="small" :type="farmingTypeTag(row.operationType)" effect="light">{{ farmingTypeText(row.operationType) }}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="operationDate" label="操作日期" width="120" />
+          <el-table-column label="用药名称" width="130">
+            <template #default="{row}">{{ row.drugName || '—' }}</template>
+          </el-table-column>
+          <el-table-column label="安全间隔" width="100">
+            <template #default="{row}">
+              <span v-if="row.safetyIntervalDays != null">{{ row.safetyIntervalDays }} 天</span>
+              <span v-else>—</span>
+            </template>
+          </el-table-column>
+          <el-table-column prop="remark" label="备注" min-width="140" show-overflow-tooltip>
+            <template #default="{row}">{{ row.remark || '—' }}</template>
+          </el-table-column>
+        </el-table>
+        <el-empty v-else description="暂无农事档案" :image-size="60" />
       </div>
     </div>
 
@@ -63,6 +86,9 @@ const traceResult = ref(null)
 
 const hotProducts = ref([])
 const hotLoading = ref(true)
+
+const farmingTypeText = (t) => ({ SOWING: '播种', FERTILIZING: '施肥', PESTICIDE: '用药' }[t] || t)
+const farmingTypeTag = (t) => ({ SOWING: 'success', FERTILIZING: 'warning', PESTICIDE: 'danger' }[t] || 'info')
 
 const getHotProducts = async () => {
   try {

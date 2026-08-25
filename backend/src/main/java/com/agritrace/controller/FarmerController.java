@@ -5,6 +5,7 @@ import com.agritrace.entity.TracingCode;
 import com.agritrace.repository.HotProductRepository;
 import com.agritrace.repository.ProductRepository;
 import com.agritrace.repository.TracingCodeRepository;
+import com.agritrace.service.FarmingRecordService;
 import jakarta.servlet.http.HttpServletRequest;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
@@ -18,6 +19,7 @@ public class FarmerController {
     @Autowired private ProductRepository productRepository;
     @Autowired private TracingCodeRepository tracingCodeRepository;
     @Autowired private HotProductRepository hotProductRepository;
+    @Autowired private FarmingRecordService farmingRecordService;
 
     @GetMapping("/products")
     public Result<List<Product>> getProducts(HttpServletRequest request) {
@@ -59,7 +61,9 @@ public class FarmerController {
         if (!"SYS_ADMIN".equals(role) && !p.getFarmerId().equals(userId)) {
             return Result.error(403, "没有该操作的权限");
         }
-        
+        // 用药安全间隔期内禁止生成新溯源码（规则在 FarmingRecordService）
+        farmingRecordService.assertTraceCodeAllowed(productId);
+
         TracingCode tc = new TracingCode();
         tc.setProductId(productId);
         tc.setTraceCode(UUID.randomUUID().toString().replace("-", "").substring(0, 16).toUpperCase());

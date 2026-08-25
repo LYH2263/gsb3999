@@ -11,6 +11,9 @@
         <router-link v-if="['FARMER', 'SYS_ADMIN'].includes(userStore.role)" to="/products" class="block px-6 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors" active-class="bg-green-50 text-green-600 border-r-4 border-green-600">
           农产品管理
         </router-link>
+        <router-link v-if="['FARMER', 'SYS_ADMIN'].includes(userStore.role)" to="/farming" class="block px-6 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors" active-class="bg-green-50 text-green-600 border-r-4 border-green-600">
+          农事档案
+        </router-link>
         <router-link v-if="['LOGS_ADMIN', 'SYS_ADMIN'].includes(userStore.role)" to="/logistics" class="block px-6 py-3 text-gray-700 hover:bg-green-50 hover:text-green-600 transition-colors" active-class="bg-green-50 text-green-600 border-r-4 border-green-600">
           物流上链管理
         </router-link>
