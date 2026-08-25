@@ -36,4 +36,20 @@ api.interceptors.response.use(
     return Promise.reject(err)
   }
 )
+
+export const farmerApi = {
+  getProducts: () => api.get('/farmer/products'),
+  generateTraceCode: (productId) => api.post(`/farmer/trace_code/${productId}`)
+}
+
+export const farmingApi = {
+  addRecord: (data) => api.post('/farming/record', data),
+  getRecords: (productId) => api.get('/farming/records', { params: productId ? { productId } : {} })
+}
+
+export const publicApi = {
+  getHotProducts: () => api.get('/public/hot'),
+  trace: (code) => api.get(`/public/trace/${code}`)
+}
+
 export default api
