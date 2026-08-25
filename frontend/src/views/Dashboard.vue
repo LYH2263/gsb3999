@@ -30,6 +30,24 @@
           </el-timeline-item>
         </el-timeline>
         <el-empty v-else description="暂无物流信息" />
+
+        <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-4">🌱 农事档案（只读）</h3>
+        <el-timeline v-if="traceResult.farmingRecords && traceResult.farmingRecords.length > 0">
+          <el-timeline-item
+            v-for="(rec, idx) in traceResult.farmingRecords"
+            :key="idx"
+            :timestamp="rec.operationDate"
+            :color="farmingTypeMeta(rec.operationType).color"
+          >
+            <el-tag :type="farmingTypeMeta(rec.operationType).tag" size="small" class="mr-2">{{ farmingTypeMeta(rec.operationType).label }}</el-tag>
+            <span v-if="rec.materialName" class="font-bold text-gray-700">{{ rec.materialName }}</span>
+            <span v-if="rec.operationType === 'PESTICIDE'" class="ml-2">
+              <el-tag type="danger" size="small" effect="plain">安全间隔 {{ rec.safetyIntervalDays }} 天</el-tag>
+            </span>
+            <div v-if="rec.remark" class="text-sm text-gray-500 mt-1">{{ rec.remark }}</div>
+          </el-timeline-item>
+        </el-timeline>
+        <el-empty v-else description="暂无农事档案" />
       </div>
     </div>
 
@@ -54,7 +72,7 @@
 </template>
 <script setup>
 import { ref, onMounted } from 'vue'
-import api from '@/api'
+import { publicApi } from '@/api'
 import { ElMessage } from 'element-plus'
 
 const traceCode = ref('')
@@ -64,9 +82,16 @@ const traceResult = ref(null)
 const hotProducts = ref([])
 const hotLoading = ref(true)
 
+const FARMING_TYPE_META = {
+  SOWING: { label: '播种', tag: 'success', color: '#10b981' },
+  FERTILIZING: { label: '施肥', tag: 'warning', color: '#f59e0b' },
+  PESTICIDE: { label: '用药', tag: 'danger', color: '#ef4444' }
+}
+const farmingTypeMeta = (t) => FARMING_TYPE_META[t] || { label: t || '未知', tag: 'info', color: '#909399' }
+
 const getHotProducts = async () => {
   try {
-    const res = await api.get('/public/hot')
+    const res = await publicApi.getHotProducts()
     hotProducts.value = res.data
   } finally {
     hotLoading.value = false
@@ -78,7 +103,7 @@ const queryTrace = async () => {
   tracing.value = true
   traceResult.value = null
   try {
-    const res = await api.get(`/public/trace/${traceCode.value.trim()}`)
+    const res = await publicApi.trace(traceCode.value.trim())
     traceResult.value = res.data
   } catch(e) {
   } finally {
