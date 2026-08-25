@@ -52,7 +52,11 @@ public class SecurityInterceptor implements HandlerInterceptor {
                     response.setStatus(403);
                     return false;
                 }
-                
+                if (path.startsWith("/api/farming") && !("FARMER".equals(role) || "SYS_ADMIN".equals(role))) {
+                    response.setStatus(403);
+                    return false;
+                }
+
                 return true;
             } catch (Exception e) {
                 response.setStatus(401);
