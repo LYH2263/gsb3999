@@ -108,6 +108,29 @@ CREATE TABLE `hot_product` (
 
 
 -- ----------------------------
+-- 6. Table structure for farming_record : 农事档案记录表
+-- 农户为农产品登记的播种/施肥/用药记录；用药记录含安全间隔天数，用于阻断间隔期内生成溯源码
+-- ----------------------------
+DROP TABLE IF EXISTS `farming_record`;
+CREATE TABLE `farming_record` (
+  `id` BIGINT NOT NULL AUTO_INCREMENT COMMENT '主键ID',
+  `product_id` BIGINT NOT NULL COMMENT '关联农产品ID',
+  `farmer_id` BIGINT NOT NULL COMMENT '登记农户ID (关联sys_user)',
+  `operation_type` VARCHAR(20) NOT NULL COMMENT '操作类型: SOWING(播种), FERTILIZING(施肥), PESTICIDE(用药)',
+  `operation_date` DATE NOT NULL COMMENT '操作日期',
+  `drug_name` VARCHAR(100) DEFAULT NULL COMMENT '用药名称(仅用药记录)',
+  `safety_interval_days` INT DEFAULT NULL COMMENT '安全间隔天数(仅用药记录)',
+  `remark` VARCHAR(255) DEFAULT NULL COMMENT '备注',
+  `created_at` DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP COMMENT '登记时间',
+  PRIMARY KEY (`id`) USING BTREE,
+  INDEX `idx_farming_product`(`product_id`) USING BTREE,
+  INDEX `idx_farming_farmer`(`farmer_id`) USING BTREE,
+  CONSTRAINT `fk_farming_product` FOREIGN KEY (`product_id`) REFERENCES `product` (`id`) ON DELETE CASCADE ON UPDATE CASCADE,
+  CONSTRAINT `fk_farming_farmer` FOREIGN KEY (`farmer_id`) REFERENCES `sys_user` (`id`) ON DELETE CASCADE ON UPDATE CASCADE
+) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci COMMENT='农事档案记录表(播种/施肥/用药)';
+
+
+-- ----------------------------
 -- Records Seeding: 初始测试数据 (符合 "0 Mock 数据, 拒绝空库交付" 的规范)
 -- 密码均为 123456 的 BCrypt 哈希值: $2a$10$7JB720yubVSZvUI0rEqK/.VqGOZTH.ulu33dHOiBE8ByOhJIrdAu2
 -- ----------------------------
@@ -139,5 +162,13 @@ INSERT INTO `logistics` (`id`, `trace_code_id`, `logistics_admin_id`, `location`
 INSERT INTO `hot_product` (`id`, `product_id`, `search_count`, `is_display`) VALUES
 (1, 1, 15302, 1),
 (2, 2, 5840, 1);
+
+-- 农事档案：播种日期均早于对应产品采摘日期；用药安全间隔期已过期，不影响初始溯源码生成
+INSERT INTO `farming_record` (`id`, `product_id`, `farmer_id`, `operation_type`, `operation_date`, `drug_name`, `safety_interval_days`, `remark`) VALUES
+(1, 1, 2, 'SOWING', '2023-03-10', NULL, NULL, '春季定植苹果树苗'),
+(2, 1, 2, 'FERTILIZING', '2023-06-15', NULL, NULL, '追施腐熟有机肥'),
+(3, 1, 2, 'PESTICIDE', '2023-08-20', '苦参碱', 15, '防治红蜘蛛，生物源农药'),
+(4, 2, 2, 'SOWING', '2023-04-05', NULL, NULL, '稻花香2号育秧播种'),
+(5, 2, 2, 'FERTILIZING', '2023-07-01', NULL, NULL, '分蘖期追施农家肥');
 
 SET FOREIGN_KEY_CHECKS = 1;
