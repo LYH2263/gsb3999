@@ -30,6 +30,26 @@
           </el-timeline-item>
         </el-timeline>
         <el-empty v-else description="暂无物流信息" />
+
+        <h3 class="text-lg font-semibold text-gray-800 mt-6 mb-4">🌱 农事档案 (只读)</h3>
+        <el-table v-if="traceResult.farmingRecords && traceResult.farmingRecords.length > 0" :data="traceResult.farmingRecords" stripe class="w-full">
+          <el-table-column label="操作类型" width="110">
+            <template #default="{row}">
+              <el-tag :type="opTagType(row.operationType)">{{ opLabel(row.operationType) }}</el-tag>
+            </template>
+          </el-table-column>
+          <el-table-column prop="operationDate" label="操作日期" width="130" />
+          <el-table-column label="用药名称">
+            <template #default="{row}">{{ row.drugName || '—' }}</template>
+          </el-table-column>
+          <el-table-column label="安全间隔(天)" width="120">
+            <template #default="{row}">{{ row.safetyIntervalDays != null ? row.safetyIntervalDays : '—' }}</template>
+          </el-table-column>
+          <el-table-column prop="remark" label="备注">
+            <template #default="{row}">{{ row.remark || '—' }}</template>
+          </el-table-column>
+        </el-table>
+        <el-empty v-else description="暂无农事档案" />
       </div>
     </div>
 
@@ -63,6 +83,9 @@ const traceResult = ref(null)
 
 const hotProducts = ref([])
 const hotLoading = ref(true)
+
+const opLabel = (t) => ({ SOWING: '播种', FERTILIZING: '施肥', PESTICIDE: '用药' }[t] || t)
+const opTagType = (t) => ({ SOWING: 'success', FERTILIZING: 'warning', PESTICIDE: 'danger' }[t] || 'info')
 
 const getHotProducts = async () => {
   try {

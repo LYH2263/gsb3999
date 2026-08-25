@@ -19,6 +19,7 @@ const routes = [
       { path: '', redirect: '/dashboard' },
       { path: 'dashboard', name: 'Dashboard', component: () => import('@/views/Dashboard.vue') },
       { path: 'products', name: 'Products', component: () => import('@/views/Products.vue'), meta: { roles: ['FARMER', 'SYS_ADMIN'] } },
+      { path: 'farming', name: 'FarmingRecords', component: () => import('@/views/FarmingRecords.vue'), meta: { roles: ['FARMER', 'SYS_ADMIN'] } },
       { path: 'logistics', name: 'Logistics', component: () => import('@/views/Logistics.vue'), meta: { roles: ['LOGS_ADMIN', 'SYS_ADMIN'] } },
       { path: 'users', name: 'UserAdmin', component: () => import('@/views/UserAdmin.vue'), meta: { roles: ['SYS_ADMIN'] } }
     ]
